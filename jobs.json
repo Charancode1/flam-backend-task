@@ -1,0 +1,47 @@
+[
+    {
+        "id": "job1",
+        "command": "echo Hello from job1",
+        "state": "completed",
+        "attempts": 0,
+        "max_retries": 3,
+        "created_at": "2025-11-09T15:26:35.010988",
+        "updated_at": "2025-11-09T15:26:35.010988"
+    },
+    {
+        "id": "job2",
+        "command": "echo Auto job!",
+        "state": "completed",
+        "attempts": 0,
+        "max_retries": 3,
+        "created_at": "2025-11-09T16:25:02Z",
+        "updated_at": "2025-11-09T16:25:02Z"
+    },
+    {
+        "id": "job3",
+        "command": "echo Worker test running",
+        "state": "completed",
+        "attempts": 0,
+        "max_retries": 3,
+        "created_at": "2025-11-09T16:28:54Z",
+        "updated_at": "2025-11-09T16:28:54Z"
+    },
+    {
+        "id": "job3",
+        "command": "echo Worker test running",
+        "state": "completed",
+        "attempts": 0,
+        "max_retries": 3,
+        "created_at": "2025-11-09T16:29:25Z",
+        "updated_at": "2025-11-09T16:29:25Z"
+    },
+    {
+        "id": "fail1",
+        "command": "exit 1",
+        "state": "dead",
+        "attempts": 3,
+        "max_retries": 3,
+        "created_at": "2025-11-09T16:34:45Z",
+        "updated_at": "2025-11-09T16:35:03Z"
+    }
+]
