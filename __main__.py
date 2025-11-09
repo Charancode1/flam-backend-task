@@ -33,12 +33,12 @@ def enqueue(job_data):
     try:
         job = json.loads(job_data)
     except json.JSONDecodeError:
-        click.echo("❌ Invalid JSON. Provide job as a JSON string.")
+        click.echo(" Invalid JSON. Provide job as a JSON string.")
         return
 
     # required fields
     if "id" not in job or "command" not in job:
-        click.echo("❌ job must include 'id' and 'command' fields.")
+        click.echo(" job must include 'id' and 'command' fields.")
         return
 
     # fill defaults
@@ -53,14 +53,14 @@ def enqueue(job_data):
     try:
         storage.init_storage()
     except Exception as e:
-        click.echo(f"❌ Storage initialization failed: {e}")
+        click.echo(f" Storage initialization failed: {e}")
         return
 
     try:
         storage.add_job(job)
-        click.echo(f"✅ Job enqueued: id={job['id']}, command={job['command']}")
+        click.echo(f" Job enqueued: id={job['id']}, command={job['command']}")
     except Exception as e:
-        click.echo(f"❌ Failed to save job: {e}")
+        click.echo(f" Failed to save job: {e}")
 
 
 @cli.group()
@@ -72,13 +72,13 @@ def worker():
 @worker.command('start')
 @click.option('--count', default=1, help='Number of workers to start.')
 def start_workers(count):
-    click.echo(f"🚀 Starting {count} worker(s)...")
+    click.echo(f" Starting {count} worker(s)...")
     # TODO: later we will call worker.start_workers(count)
 
 
 @worker.command('stop')
 def stop_workers():
-    click.echo("🛑 Stopping all workers...")
+    click.echo(" Stopping all workers...")
     # TODO: later we will signal workers to stop
 
 
@@ -116,7 +116,7 @@ def list(state):
     try:
         storage.init_storage()
     except Exception as e:
-        click.echo(f"❌ Storage init failed: {e}")
+        click.echo(f" Storage init failed: {e}")
         return
 
     jobs = storage.list_jobs(state=state) if state else storage.list_jobs()
@@ -137,7 +137,7 @@ def run():
     pending_jobs = [job for job in jobs if job['state'] == 'pending']
 
     if not pending_jobs:
-        click.echo("⚡ No pending jobs to run.")
+        click.echo(" No pending jobs to run.")
         return
 
     for job in pending_jobs:
@@ -150,13 +150,13 @@ def run():
             result = subprocess.run(job['command'], shell=True, capture_output=True, text=True)
             if result.returncode == 0:
                 job['state'] = 'completed'
-                click.echo(f"✅ Job {job['id']} completed successfully.")
+                click.echo(f" Job {job['id']} completed successfully.")
             else:
                 job['state'] = 'failed'
-                click.echo(f"❌ Job {job['id']} failed: {result.stderr.strip()}")
+                click.echo(f" Job {job['id']} failed: {result.stderr.strip()}")
         except Exception as e:
             job['state'] = 'failed'
-            click.echo(f"💥 Error executing job {job['id']}: {e}")
+            click.echo(f" Error executing job {job['id']}: {e}")
 
         save_jobs(jobs)
 
@@ -167,7 +167,7 @@ def worker(interval):
     import time, subprocess
     from storage import load_jobs, save_jobs
 
-    click.echo(f"🧠 Worker started — polling every {interval} seconds. Press Ctrl+C to stop.")
+    click.echo(f" Worker started — polling every {interval} seconds. Press Ctrl+C to stop.")
     
     try:
         while True:
@@ -176,7 +176,7 @@ def worker(interval):
             
             if pending_jobs:
                 job = pending_jobs[0]
-                click.echo(f"▶️ Running job {job['id']}: {job['command']}")
+                click.echo(f" Running job {job['id']}: {job['command']}")
                 job['state'] = 'processing'
                 save_jobs(jobs)
 
@@ -184,34 +184,35 @@ def worker(interval):
                     result = subprocess.run(job['command'], shell=True, capture_output=True, text=True)
                     if result.returncode == 0:
                         job['state'] = 'completed'
-                        click.echo(f"✅ Job {job['id']} completed successfully.")
+                        click.echo(f" Job {job['id']} completed successfully.")
                     else:
                         job['attempts'] += 1
                         if job['attempts'] < job['max_retries']:
                             job['state'] = 'pending'
-                            click.echo(f"🔁 Job {job['id']} failed (attempt {job['attempts']}/{job['max_retries']}). Retrying later...")
+                            click.echo(f" Job {job['id']} failed (attempt {job['attempts']}/{job['max_retries']}). Retrying later...")
                         else:
                             job['state'] = 'dead'
-                            click.echo(f"💀 Job {job['id']} permanently failed after {job['attempts']} attempts.")
+                            click.echo(f" Job {job['id']} permanently failed after {job['attempts']} attempts.")
                 except Exception as e:
                     job['attempts'] += 1
                     if job['attempts'] < job['max_retries']:
                         job['state'] = 'pending'
-                        click.echo(f"💥 Error executing job {job['id']} (attempt {job['attempts']}/{job['max_retries']}): {e}")
+                        click.echo(f" Error executing job {job['id']} (attempt {job['attempts']}/{job['max_retries']}): {e}")
                     else:
                         job['state'] = 'dead'
-                        click.echo(f"💀 Job {job['id']} permanently failed due to repeated errors.")
+                        click.echo(f" Job {job['id']} permanently failed due to repeated errors.")
 
                 job['updated_at'] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
                 save_jobs(jobs)
             else:
-                click.echo("😴 No pending jobs. Waiting...")
+                click.echo(" No pending jobs. Waiting...")
             
             time.sleep(interval)
 
     except KeyboardInterrupt:
-        click.echo("\n🛑 Worker stopped manually.")
+        click.echo("\n Worker stopped manually.")
 
 
 if __name__ == '__main__':
     cli()
+
